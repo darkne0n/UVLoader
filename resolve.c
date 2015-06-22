@@ -483,7 +483,7 @@ uvl_resolve_add_imports (module_info_t    *mod_info,         ///< Module with im
     const u32_t *func_nid_table;
 
     // get functions first
-    IF_VERBOSE LOG ("Function Import Num: %u", IMP_GET_FUNC_COUNT (imp_table));
+    IF_VERBOSE LOG ("Function Import Num: %u, Module Name: %s, NID: 0x%08X", IMP_GET_FUNC_COUNT (imp_table), IMP_GET_NAME(imp_table), IMP_GET_NID(imp_table));
     if (reload_imp_table) // first attempt: try reloaded module
     {
         func_nid_table = IMP_GET_FUNC_TABLE (reload_imp_table);
@@ -517,7 +517,7 @@ uvl_resolve_add_imports (module_info_t    *mod_info,         ///< Module with im
     }
     // get variables
     res_entry.type = RESOLVE_TYPE_VARIABLE;
-    IF_VERBOSE LOG ("Variable Import Num: %u", IMP_GET_VARS_COUNT (imp_table));
+    IF_VERBOSE LOG ("Variable Import Num: %u, Module Name: %s, NID: 0x%08X", IMP_GET_VARS_COUNT (imp_table), IMP_GET_NAME(imp_table), IMP_GET_NID(imp_table));
     for(i = 0; i < IMP_GET_VARS_COUNT (imp_table); i++)
     {
         res_entry.nid = IMP_GET_VARS_TABLE (imp_table)[i];
@@ -562,7 +562,7 @@ uvl_resolve_add_exports (module_exports_t *exp_table) ///< Module's export table
 
     // get functions first
     res_entry.type = RESOLVE_TYPE_FUNCTION;
-    IF_VERBOSE LOG ("Function Export Num: %u", exp_table->num_functions);
+    IF_VERBOSE LOG ("Function Export Num: %u, Module Name: UNKN, NID: 0x%08X", exp_table->num_functions, exp_table->module_nid);
     for(i = 0; i < exp_table->num_functions; i++, offset++)
     {
         res_entry.nid = exp_table->nid_table[offset];
@@ -575,7 +575,7 @@ uvl_resolve_add_exports (module_exports_t *exp_table) ///< Module's export table
     }
     // get variables
     res_entry.type = RESOLVE_TYPE_VARIABLE;
-    IF_VERBOSE LOG ("Variable Export Num: %u", exp_table->num_vars);
+    IF_VERBOSE LOG ("Variable Export Num: %u, Module Name: UNKN, NID: 0x%08X", exp_table->num_vars, exp_table->module_nid);
     for(i = 0; i < exp_table->num_vars; i++, offset++)
     {
         res_entry.nid = exp_table->nid_table[offset];
@@ -829,7 +829,7 @@ uvl_resolve_add_module (PsvUID modid, ///< UID of the module
         for (imports = (module_imports_t*)((u32_t)m_mod_info.segments[0].vaddr + mod_info->stub_top); 
             (u32_t)imports < ((u32_t)m_mod_info.segments[0].vaddr + mod_info->stub_end); imports = IMP_GET_NEXT (imports))
         {
-            IF_VERBOSE LOG ("Module: %s", IMP_GET_NAME (imports));
+            IF_VERBOSE LOG ("Module: %s, NID: 0x%08X", IMP_GET_NAME (imports), IMP_GET_NID(imports));
             if (uvl_resolve_add_imports (mod_info, reload_imports, imports, type & RESOLVE_IMPS_SVC_ONLY) < 0)
             {
                 LOG ("Unable to resolve imports at 0x%08X. Continuing.", (u32_t)imports);
