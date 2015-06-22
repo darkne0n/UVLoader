@@ -107,7 +107,7 @@ uvl_resolve_table_add (resolve_entry_t *entry) ///< Entry to add
         LOG ("Resolve table full. Please recompile with larger table.");
         return -1;
     }
-    IF_VERBOSE LOG ("Adding entry #%u to resolve table.", g_resolve_table->length);
+    //IF_VERBOSE LOG ("Adding entry #%u to resolve table.", g_resolve_table->length);
     IF_VERBOSE LOG ("NID: 0x%08X, type: %u, value 0x%08X", entry->nid, entry->type, entry->value.value);
     memcpy (&g_resolve_table->table[g_resolve_table->length], entry, sizeof (resolve_entry_t));
     g_resolve_table->length++;
@@ -244,7 +244,7 @@ uvl_resolve_import_stub_to_entry (void *stub,  ///< Stub function to read
     }
     // put the finishing touches
     entry->nid = nid;
-    IF_VERBOSE LOG ("Mapped resolved import NID: 0x%X to 0x%X of type %u.", entry->nid, entry->value.value, entry->type);
+    IF_VERBOSE LOG ("NID: 0x%X,type: %u,value 0x%X ", entry->nid, entry->type, entry->value.value);
     return 0;
 }
 
@@ -483,7 +483,7 @@ uvl_resolve_add_imports (module_info_t    *mod_info,         ///< Module with im
     const u32_t *func_nid_table;
 
     // get functions first
-    IF_VERBOSE LOG ("Found %u resolved function imports to copy.", IMP_GET_FUNC_COUNT (imp_table));
+    IF_VERBOSE LOG ("Function Import Num: %u", IMP_GET_FUNC_COUNT (imp_table));
     if (reload_imp_table) // first attempt: try reloaded module
     {
         func_nid_table = IMP_GET_FUNC_TABLE (reload_imp_table);
@@ -517,7 +517,7 @@ uvl_resolve_add_imports (module_info_t    *mod_info,         ///< Module with im
     }
     // get variables
     res_entry.type = RESOLVE_TYPE_VARIABLE;
-    IF_VERBOSE LOG ("Found %u resolved variable imports to copy.", IMP_GET_VARS_COUNT (imp_table));
+    IF_VERBOSE LOG ("Variable Import Num: %u", IMP_GET_VARS_COUNT (imp_table));
     for(i = 0; i < IMP_GET_VARS_COUNT (imp_table); i++)
     {
         res_entry.nid = IMP_GET_VARS_TABLE (imp_table)[i];
@@ -562,7 +562,7 @@ uvl_resolve_add_exports (module_exports_t *exp_table) ///< Module's export table
 
     // get functions first
     res_entry.type = RESOLVE_TYPE_FUNCTION;
-    IF_VERBOSE LOG ("Found %u resolved function exports to copy.", exp_table->num_functions);
+    IF_VERBOSE LOG ("Function Export Num: %u", exp_table->num_functions);
     for(i = 0; i < exp_table->num_functions; i++, offset++)
     {
         res_entry.nid = exp_table->nid_table[offset];
@@ -575,7 +575,7 @@ uvl_resolve_add_exports (module_exports_t *exp_table) ///< Module's export table
     }
     // get variables
     res_entry.type = RESOLVE_TYPE_VARIABLE;
-    IF_VERBOSE LOG ("Found %u resolved variable exports to copy.", exp_table->num_vars);
+    IF_VERBOSE LOG ("Variable Export Num: %u", exp_table->num_vars);
     for(i = 0; i < exp_table->num_vars; i++, offset++)
     {
         res_entry.nid = exp_table->nid_table[offset];
@@ -795,7 +795,7 @@ uvl_resolve_add_module (PsvUID modid, ///< UID of the module
         {
             if (exports->lib_name != NULL)
             {
-                IF_VERBOSE LOG ("Adding exports for %s", exports->lib_name);
+                IF_VERBOSE LOG ("Module: %s", exports->lib_name);
             }
             if (uvl_resolve_add_exports (exports) < 0)
             {
@@ -829,7 +829,7 @@ uvl_resolve_add_module (PsvUID modid, ///< UID of the module
         for (imports = (module_imports_t*)((u32_t)m_mod_info.segments[0].vaddr + mod_info->stub_top); 
             (u32_t)imports < ((u32_t)m_mod_info.segments[0].vaddr + mod_info->stub_end); imports = IMP_GET_NEXT (imports))
         {
-            IF_VERBOSE LOG ("Adding imports for %s", IMP_GET_NAME (imports));
+            IF_VERBOSE LOG ("Module: %s", IMP_GET_NAME (imports));
             if (uvl_resolve_add_imports (mod_info, reload_imports, imports, type & RESOLVE_IMPS_SVC_ONLY) < 0)
             {
                 LOG ("Unable to resolve imports at 0x%08X. Continuing.", (u32_t)imports);
